@@ -1,79 +1,29 @@
 # Contributing
 
-Thanks for helping improve `slackcache`.
+Thanks for helping make Slack archive workflows safer and more useful.
 
-This project values small, reviewable contributions with clear verification.
+## Local setup
 
-## Issues
-
-Before opening an issue:
-
-- Search existing issues.
-- Confirm the issue applies to `slackcache`.
-- Include enough context for maintainers to understand or reproduce the request.
-
-Bug reports should include:
-
-- What happened.
-- What you expected.
-- Steps to reproduce.
-- Relevant logs, screenshots, or files.
-- The smallest verification step that demonstrates the issue.
-
-Feature requests should include:
-
-- The use case.
-- Why the current project does not solve it.
-- Risks or compatibility concerns.
-- Suggested files or behavior that may need to change.
-
-## Pull Requests
-
-Pull requests should:
-
-- Focus on one reviewable intent.
-- Use a branch.
-- Follow Conventional Commits.
-- Include tests or verification appropriate to the change.
-- Update documentation when behavior or usage changes.
-- Avoid unrelated formatting or dependency churn.
-- Avoid secrets, private contact details, and project-specific sensitive information.
-
-## Review Pack
-
-Use this format for meaningful changes:
-
-```md
-## Review Pack
-Repo:
-Branch:
-PR:
-Task:
-Status: done / blocked / needs review
-Summary:
-Commits:
-Files changed:
-Verification:
-Risk level:
-Rollback plan:
-Human decision needed:
-Next recommended task:
+```bash
+npm install
+npm run check
+npm test
+npm run smoke
 ```
 
-## Verification
+## Principles
 
-Every contribution should include verification.
+- Keep local-first behavior boring and obvious.
+- Never add network access to an existing command silently.
+- Prefer deterministic fixtures over live services in tests.
+- Add scope reporting for any new importer capability.
+- Treat Slack exports as sensitive personal/company data.
 
-Examples:
+## Pull requests
 
-- Documentation: inspect rendered Markdown or review the diff.
-- Tests: run the targeted test command.
-- Types: run the project typecheck.
-- Build: run the smallest build command that covers the change.
-- Manual QA: provide exact steps and observed result.
+Please include:
 
-If verification cannot be run, explain why and provide the exact command maintainers should run.
-
-## Maintainer Review
-
-Maintainers may request narrower scope, clearer verification, additional tests, or safer defaults before merging.
+- What changed and why.
+- Any privacy or security implications.
+- Fixture-backed tests for parser/search changes.
+- CLI smoke coverage for user-visible behavior when practical.
