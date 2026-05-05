@@ -1,0 +1,5 @@
+[
+  {"type":"message","user":"U001","text":"Deploy checklist lives at https://internal.example/checklist and token=xoxb-secret-token","ts":"1777586400.000100","thread_ts":"1777586400.000100","reply_count":1},
+  {"type":"message","user":"U002","text":"I copied it into the local runbook. Email ada@example.com if the deploy stalls.","ts":"1777586460.000200","thread_ts":"1777586400.000100"},
+  {"type":"message","user":"U001","text":"The customer export is ready for local search.","ts":"1777590000.000300"}
+]
