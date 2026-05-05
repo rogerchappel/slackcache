@@ -1,0 +1,32 @@
+{
+  "name": "slackcache",
+  "version": 1,
+  "networkDefault": "disabled",
+  "inputs": [
+    "Slack export directory",
+    "API-style local fixture directory"
+  ],
+  "outputs": [
+    "slackcache.index.json",
+    "terminal scope/search/thread output"
+  ],
+  "commands": [
+    {"name":"import","risk":"local-read-write","description":"Build local redacted cache index"},
+    {"name":"scope","risk":"local-read","description":"Print cache boundaries"},
+    {"name":"search","risk":"local-read","description":"Search local cache"},
+    {"name":"thread","risk":"local-read","description":"Show local thread context"}
+  ],
+  "privacy": {
+    "redactionDefault": true,
+    "telemetry": false,
+    "hiddenNetworkCalls": false,
+    "credentialDiscovery": false
+  },
+  "verification": [
+    "npm run check",
+    "npm test",
+    "npm run build",
+    "npm run smoke",
+    "bash scripts/validate.sh"
+  ]
+}
