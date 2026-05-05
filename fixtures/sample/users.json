@@ -1,0 +1,4 @@
+[
+  {"id":"U001","name":"ada","real_name":"Ada Lovelace","profile":{"email":"ada@example.com","display_name":"ada"}},
+  {"id":"U002","name":"grace","real_name":"Grace Hopper","profile":{"email":"grace@example.com","display_name":"grace"}}
+]
