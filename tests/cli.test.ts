@@ -11,9 +11,9 @@ const execFileAsync = promisify(execFile);
 test('CLI imports and searches fixture data', async () => {
   const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-cli-'));
   try {
-    const importResult = await execFileAsync('node', ['dist/cli.js', 'import', 'fixtures/sample', '--output', dir]);
+    const importResult = await execFileAsync('node', ['dist/src/cli.js', 'import', 'fixtures/sample', '--output', dir]);
     assert.match(importResult.stdout, /Messages: 4/);
-    const searchResult = await execFileAsync('node', ['dist/cli.js', 'search', 'runbook', '--index', dir]);
+    const searchResult = await execFileAsync('node', ['dist/src/cli.js', 'search', 'runbook', '--index', dir]);
     assert.match(searchResult.stdout, /local runbook/);
   } finally {
     await rm(dir, { recursive: true, force: true });

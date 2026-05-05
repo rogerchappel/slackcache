@@ -7,7 +7,7 @@ test('redacts emails, urls, and Slack tokens', () => {
   assert.equal(result.text.includes('ada@example.com'), false);
   assert.equal(result.text.includes('https://x.test'), false);
   assert.equal(result.text.includes('xoxb-123'), false);
-  assert.deepEqual(result.labels.sort(), ['email', 'generic-token', 'url']);
+  assert.deepEqual(result.labels.sort(), ['email', 'generic-token', 'slack-token', 'url']);
 });
 
 test('can leave text untouched when disabled', () => {
