@@ -4,7 +4,7 @@ import { renderHits, renderScope, renderThread } from './render.js';
 import { searchIndex, threadMessages } from './search.js';
 import { loadIndex, saveIndex } from './store.js';
 
-type Args = Record<string, string | boolean | undefined> & { _: string[] };
+type Args = { _: string[] } & { [key: string]: string | boolean | string[] | undefined };
 
 async function main(argv = process.argv.slice(2)): Promise<void> {
   const args = parseArgs(argv);
@@ -66,11 +66,11 @@ function parseArgs(argv: string[]): Args {
   return out;
 }
 
-function stringOpt(value: string | boolean | undefined): string | undefined {
+function stringOpt(value: string | boolean | string[] | undefined): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
-function numberOpt(value: string | boolean | undefined): number | undefined {
+function numberOpt(value: string | boolean | string[] | undefined): number | undefined {
   if (typeof value !== 'string') return undefined;
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) ? parsed : undefined;
