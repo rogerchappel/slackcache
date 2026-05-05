@@ -1,58 +1,18 @@
 # Security Policy
 
-## Supported Versions
+## Supported versions
 
-Replace this section with the supported versions for `slackcache`.
+slackcache is pre-1.0. Please use the latest release from `main` or npm once published.
 
-Example:
+## Reporting a vulnerability
 
-```md
-| Version | Supported |
-| --- | --- |
-| .x | Yes |
-| < .0 | No |
-```
+Open a private GitHub security advisory or contact the maintainer directly. Please do not paste private Slack exports into public issues.
 
-If the project does not publish versioned releases yet, say that clearly.
+## Data handling promises
 
-## Reporting a Vulnerability
+- V1 performs no network calls.
+- V1 does not look for credentials outside the explicit input directory.
+- V1 redacts common sensitive patterns by default.
+- V1 test fixtures are synthetic.
 
-Please do not report suspected vulnerabilities in public issues, pull requests, or discussions.
-
-Ask maintainers for the private security reporting path before sharing details.
-
-If no private reporting path exists yet, ask maintainers through public project channels for a private reporting path. Do not include exploit details, secrets, personal data, or sensitive technical details in public messages.
-
-## What to Include
-
-When a private reporting path is available, include:
-
-- A clear description of the issue.
-- Affected versions, files, packages, workflows, or configuration.
-- Steps to reproduce, proof of concept, or attack scenario when safe to share.
-- Potential impact.
-- Suggested mitigation, if known.
-
-## Response Expectations
-
-Maintainers review good-faith reports as capacity allows.
-
-Do not imply paid support, guaranteed response times, guaranteed fixes, or service-level agreements unless `slackcache` explicitly provides them.
-
-## Scope
-
-In scope:
-
-- Vulnerabilities in slackcache.
-- Insecure default configuration shipped by this project.
-- CI, release, or dependency guidance maintained by this project.
-
-Out of scope:
-
-- General support requests.
-- Requests for guaranteed maintenance timelines.
-- Issues in unrelated downstream projects.
-
-## Disclosure
-
-Coordinate disclosure with maintainers before publishing vulnerability details.
+If you find behavior that violates those promises, treat it as a security bug.
