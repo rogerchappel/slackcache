@@ -7,8 +7,12 @@
     "slackcache": "./dist/src/cli.js"
   },
   "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
   "exports": {
-    ".": "./dist/src/index.js"
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
   },
   "files": [
     "dist",
@@ -33,6 +37,14 @@
   ],
   "author": "Roger Chappel",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rogerchappel/slackcache.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rogerchappel/slackcache/issues"
+  },
+  "homepage": "https://github.com/rogerchappel/slackcache#readme",
   "engines": {
     "node": ">=20"
   },
