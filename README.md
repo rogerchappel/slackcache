@@ -78,6 +78,17 @@ slackcache thread 1777586400.000100 --index /tmp/acme-cache --channel incidents
 
 The workflow is intentionally reviewable: import scope first, search narrow, inspect the exact thread, then decide what context is safe to pass along.
 
+## Runnable demo
+
+After building the local CLI, run the fixture-backed handoff demo:
+
+```bash
+npm run build
+bash examples/local-handoff-demo.sh
+```
+
+The script imports `fixtures/sample`, prints the scope report, searches for a deploy handoff, and opens the matching thread from a temporary local cache.
+
 ## Source attribution
 
 slackcache is a renamed, fresh implementation inspired by the local Slack archive/search direction of [`slacrawl`](https://github.com/vincentkoc/slacrawl) by Vincent Koc. This project does not copy slacrawl code or reuse its name; it preserves attribution while exploring a TypeScript, fixture-first, privacy-focused MVP.
