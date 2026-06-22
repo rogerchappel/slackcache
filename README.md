@@ -89,6 +89,16 @@ bash examples/local-handoff-demo.sh
 
 The script imports `fixtures/sample`, prints the scope report, searches for a deploy handoff, and opens the matching thread from a temporary local cache.
 
+For a shorter API-shaped fixture demo:
+
+```bash
+npm run build
+bash examples/api-handoff-triage-demo.sh
+```
+
+That script imports `fixtures/api`, searches the `agent-handoff` channel for
+auth panic context, and prints the indexed scope report.
+
 ## Source attribution
 
 slackcache is a renamed, fresh implementation inspired by the local Slack archive/search direction of [`slacrawl`](https://github.com/vincentkoc/slacrawl) by Vincent Koc. This project does not copy slacrawl code or reuse its name; it preserves attribution while exploring a TypeScript, fixture-first, privacy-focused MVP.
