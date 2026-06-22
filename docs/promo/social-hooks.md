@@ -17,3 +17,9 @@ npm run build
 bash examples/local-handoff-demo.sh
 ```
 
+For a shorter clip using the API-shaped fixture:
+
+```sh
+npm run build
+bash examples/api-handoff-triage-demo.sh
+```
