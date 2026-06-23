@@ -99,6 +99,15 @@ bash examples/api-handoff-triage-demo.sh
 That script imports `fixtures/api`, searches the `agent-handoff` channel for
 auth panic context, and prints the indexed scope report.
 
+For a report-first clip:
+
+```bash
+bash examples/scope-report-demo.sh
+```
+
+That script writes import, scope, and search output files from `fixtures/sample`
+so the demo can lead with what was indexed before showing a result.
+
 ## Source attribution
 
 slackcache is a renamed, fresh implementation inspired by the local Slack archive/search direction of [`slacrawl`](https://github.com/vincentkoc/slacrawl) by Vincent Koc. This project does not copy slacrawl code or reuse its name; it preserves attribution while exploring a TypeScript, fixture-first, privacy-focused MVP.

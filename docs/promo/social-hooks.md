@@ -10,6 +10,8 @@ Use these as draft starting points. Keep screenshots or clips tied to `fixtures/
 
 3. The useful part of a Slack archive demo is not a huge search box. It is the receipts: channels indexed, messages counted, redactions reported, and thread context shown locally.
 
+4. Report-first demo flow: run `bash examples/scope-report-demo.sh`, open `scope.txt`, then show a narrow `deploy` search from the public fixture.
+
 ## Demo CTA
 
 ```sh
@@ -22,4 +24,10 @@ For a shorter clip using the API-shaped fixture:
 ```sh
 npm run build
 bash examples/api-handoff-triage-demo.sh
+```
+
+Report-first fixture clip:
+
+```sh
+bash examples/scope-report-demo.sh
 ```
