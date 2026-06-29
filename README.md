@@ -108,6 +108,18 @@ bash examples/scope-report-demo.sh
 That script writes import, scope, and search output files from `fixtures/sample`
 so the demo can lead with what was indexed before showing a result.
 
+For an incident-handoff clip backed by the API-shaped fixture:
+
+```bash
+npm run build
+bash examples/incident-clip-demo.sh
+```
+
+That script imports `fixtures/api`, searches `agent-handoff` for `auth panic`,
+and writes the exact thread clip to a temporary directory. See
+[`docs/promo/incident-clip-video-brief.md`](docs/promo/incident-clip-video-brief.md)
+for a short video outline grounded in the fixture.
+
 ## Source attribution
 
 slackcache is a renamed, fresh implementation inspired by the local Slack archive/search direction of [`slacrawl`](https://github.com/vincentkoc/slacrawl) by Vincent Koc. This project does not copy slacrawl code or reuse its name; it preserves attribution while exploring a TypeScript, fixture-first, privacy-focused MVP.
