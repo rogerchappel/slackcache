@@ -31,3 +31,12 @@ Report-first fixture clip:
 ```sh
 bash examples/scope-report-demo.sh
 ```
+
+Redaction receipt clip:
+
+```sh
+bash examples/redaction-receipt-demo.sh
+```
+
+See [redaction receipt social hooks](redaction-receipt-social-hooks.md) for
+fixture-grounded copy that leads with the redaction counts.
