@@ -131,6 +131,16 @@ scope report, then checks the deploy search result and thread output for
 redacted URL, token-shaped, and email values. See
 [`docs/tutorials/redaction-receipt.md`](docs/tutorials/redaction-receipt.md).
 
+For a narrow thread-clip handoff:
+
+```bash
+bash examples/thread-clip-demo.sh
+```
+
+That script imports `fixtures/sample`, searches for the deploy handoff, writes
+the matching redacted thread clip, and verifies the clip still contains
+`[redacted:...]` markers. See [`docs/tutorials/thread-clip.md`](docs/tutorials/thread-clip.md).
+
 ## Source attribution
 
 slackcache is a renamed, fresh implementation inspired by the local Slack archive/search direction of [`slacrawl`](https://github.com/vincentkoc/slacrawl) by Vincent Koc. This project does not copy slacrawl code or reuse its name; it preserves attribution while exploring a TypeScript, fixture-first, privacy-focused MVP.
