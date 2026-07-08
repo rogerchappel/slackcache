@@ -113,6 +113,39 @@ so the demo can lead with what was indexed before showing a result.
 For public clip planning, use the grounded
 [demo runbook](docs/promo/demo-runbook.md).
 
+For an incident-handoff clip backed by the API-shaped fixture:
+
+```bash
+npm run build
+bash examples/incident-clip-demo.sh
+```
+
+That script imports `fixtures/api`, searches `agent-handoff` for `auth panic`,
+and writes the exact thread clip to a temporary directory. See
+[`docs/promo/incident-clip-video-brief.md`](docs/promo/incident-clip-video-brief.md)
+for a short video outline grounded in the fixture.
+
+For a redaction-receipt walkthrough:
+
+```bash
+bash examples/redaction-receipt-demo.sh
+```
+
+That script imports `fixtures/sample`, verifies the redaction counts from the
+scope report, then checks the deploy search result and thread output for
+redacted URL, token-shaped, and email values. See
+[`docs/tutorials/redaction-receipt.md`](docs/tutorials/redaction-receipt.md).
+
+For a narrow thread-clip handoff:
+
+```bash
+bash examples/thread-clip-demo.sh
+```
+
+That script imports `fixtures/sample`, searches for the deploy handoff, writes
+the matching redacted thread clip, and verifies the clip still contains
+`[redacted:...]` markers. See [`docs/tutorials/thread-clip.md`](docs/tutorials/thread-clip.md).
+
 ## Source attribution
 
 slackcache is a renamed, fresh implementation inspired by the local Slack archive/search direction of [`slacrawl`](https://github.com/vincentkoc/slacrawl) by Vincent Koc. This project does not copy slacrawl code or reuse its name; it preserves attribution while exploring a TypeScript, fixture-first, privacy-focused MVP.
