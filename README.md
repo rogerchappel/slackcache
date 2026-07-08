@@ -98,6 +98,8 @@ bash examples/api-handoff-triage-demo.sh
 
 That script imports `fixtures/api`, searches the `agent-handoff` channel for
 auth panic context, and prints the indexed scope report.
+See [API fixture thread search](docs/tutorials/api-fixture-thread-search.md)
+for the manual command breakdown.
 
 For a report-first clip:
 
@@ -107,6 +109,9 @@ bash examples/scope-report-demo.sh
 
 That script writes import, scope, and search output files from `fixtures/sample`
 so the demo can lead with what was indexed before showing a result.
+
+For public clip planning, use the grounded
+[demo runbook](docs/promo/demo-runbook.md).
 
 For an incident-handoff clip backed by the API-shaped fixture:
 
