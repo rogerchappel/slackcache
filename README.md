@@ -101,6 +101,16 @@ auth panic context, and prints the indexed scope report.
 See [API fixture thread search](docs/tutorials/api-fixture-thread-search.md)
 for the manual command breakdown.
 
+To show the same API fixture with a scope receipt before the search result:
+
+```bash
+npm run build
+bash examples/api-scope-receipt-demo.sh
+```
+
+See [API Scope Receipt Demo](docs/tutorials/api-scope-receipt.md) and
+[API Scope Receipt Hooks](docs/promo/api-scope-receipt-hooks.md).
+
 For a report-first clip:
 
 ```bash
