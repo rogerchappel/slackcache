@@ -98,6 +98,18 @@ bash examples/api-handoff-triage-demo.sh
 
 That script imports `fixtures/api`, searches the `agent-handoff` channel for
 auth panic context, and prints the indexed scope report.
+See [API fixture thread search](docs/tutorials/api-fixture-thread-search.md)
+for the manual command breakdown.
+
+To show the same API fixture with a scope receipt before the search result:
+
+```bash
+npm run build
+bash examples/api-scope-receipt-demo.sh
+```
+
+See [API Scope Receipt Demo](docs/tutorials/api-scope-receipt.md) and
+[API Scope Receipt Hooks](docs/promo/api-scope-receipt-hooks.md).
 
 For a report-first clip:
 
@@ -117,6 +129,42 @@ bash examples/redaction-review-pack-demo.sh
 
 That script imports `fixtures/sample`, searches the deploy handoff, opens the
 matching thread, and writes reviewable output files to a temporary directory.
+
+For public clip planning, use the grounded
+[demo runbook](docs/promo/demo-runbook.md).
+
+For an incident-handoff clip backed by the API-shaped fixture:
+
+```bash
+npm run build
+bash examples/incident-clip-demo.sh
+```
+
+That script imports `fixtures/api`, searches `agent-handoff` for `auth panic`,
+and writes the exact thread clip to a temporary directory. See
+[`docs/promo/incident-clip-video-brief.md`](docs/promo/incident-clip-video-brief.md)
+for a short video outline grounded in the fixture.
+
+For a redaction-receipt walkthrough:
+
+```bash
+bash examples/redaction-receipt-demo.sh
+```
+
+That script imports `fixtures/sample`, verifies the redaction counts from the
+scope report, then checks the deploy search result and thread output for
+redacted URL, token-shaped, and email values. See
+[`docs/tutorials/redaction-receipt.md`](docs/tutorials/redaction-receipt.md).
+
+For a narrow thread-clip handoff:
+
+```bash
+bash examples/thread-clip-demo.sh
+```
+
+That script imports `fixtures/sample`, searches for the deploy handoff, writes
+the matching redacted thread clip, and verifies the clip still contains
+`[redacted:...]` markers. See [`docs/tutorials/thread-clip.md`](docs/tutorials/thread-clip.md).
 
 ## Source attribution
 
