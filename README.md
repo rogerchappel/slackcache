@@ -120,6 +120,16 @@ bash examples/scope-report-demo.sh
 That script writes import, scope, and search output files from `fixtures/sample`
 so the demo can lead with what was indexed before showing a result.
 
+For a handoff review pack that keeps the redaction story visible:
+
+```bash
+npm run build
+bash examples/redaction-review-pack-demo.sh
+```
+
+That script imports `fixtures/sample`, searches the deploy handoff, opens the
+matching thread, and writes reviewable output files to a temporary directory.
+
 For public clip planning, use the grounded
 [demo runbook](docs/promo/demo-runbook.md).
 
