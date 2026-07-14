@@ -108,6 +108,16 @@ bash examples/scope-report-demo.sh
 That script writes import, scope, and search output files from `fixtures/sample`
 so the demo can lead with what was indexed before showing a result.
 
+For a handoff review pack that keeps the redaction story visible:
+
+```bash
+npm run build
+bash examples/redaction-review-pack-demo.sh
+```
+
+That script imports `fixtures/sample`, searches the deploy handoff, opens the
+matching thread, and writes reviewable output files to a temporary directory.
+
 ## Source attribution
 
 slackcache is a renamed, fresh implementation inspired by the local Slack archive/search direction of [`slacrawl`](https://github.com/vincentkoc/slacrawl) by Vincent Koc. This project does not copy slacrawl code or reuse its name; it preserves attribution while exploring a TypeScript, fixture-first, privacy-focused MVP.
