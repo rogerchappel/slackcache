@@ -62,11 +62,11 @@ No Slack API requests are made in V1.
 
 ## Privacy and safety
 
-- Redaction is on by default for emails, URLs, Slack-token-shaped strings, and generic `token=...` / `secret=...` patterns.
-- Import prints a scope report: channel count, user count, message count, date range, and redaction counts.
+- Redaction is on by default for emails in message text and user `profile.email` fields, plus URLs, Slack-token-shaped strings, and generic `token=...` / `secret=...` patterns in message text. Profile emails are omitted from the cache; user IDs and non-sensitive names remain available.
+- Import prints a scope report: channel count, user count, message count, date range, and redaction counts. Removed user profile emails are reported separately as `profile-email` redactions.
 - The cache is written only to the output directory you choose.
 - There is no telemetry, credential scraping, publishing, or hidden network access.
-- Use `--redact false` only for trusted local workflows where raw text is acceptable.
+- Use `--redact false` only for trusted local workflows where raw message text and user profile emails are acceptable in the cache.
 
 ## Agent handoff example
 
