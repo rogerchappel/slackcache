@@ -18,7 +18,7 @@ test('saves and loads the JSON cache index', async () => {
   }
 });
 
-for (const fixture of ['sample', 'api']) {
+for (const [fixture, expectedProfileEmailRedactions] of [['sample', 2], ['api', 1]] as const) {
   test(`default cache serialization omits profile emails from ${fixture} fixtures`, async () => {
     const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-private-'));
     try {
@@ -29,6 +29,7 @@ for (const fixture of ['sample', 'api']) {
       assert.doesNotMatch(serialized, /[a-z]+@example\.com/);
       assert.equal(index.users.every((user) => user.profile?.email === undefined), true);
       assert.equal(index.users.every((user) => Boolean(user.id && (user.name || user.profile?.display_name))), true);
+      assert.equal(index.scope.redactionCounts['profile-email'], expectedProfileEmailRedactions);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
