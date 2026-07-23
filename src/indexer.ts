@@ -9,9 +9,11 @@ export type BuildIndexOptions = { redact?: boolean };
 export async function buildIndex(input: string, options: BuildIndexOptions = {}): Promise<SlackCacheIndex> {
   const sourcePath = path.resolve(input);
   const loaded = await loadSlackSource(sourcePath);
-  const users = dedupeById(loaded.users);
+  const redact = options.redact !== false;
+  const sourceUsers = dedupeById(loaded.users);
   const channels = ensureChannels(loaded.channels, loaded.messagesByChannel);
-  const userNames = new Map(users.map((user) => [user.id, user.profile?.display_name || user.profile?.real_name || user.real_name || user.name || user.id]));
+  const userNames = new Map(sourceUsers.map((user) => [user.id, user.profile?.display_name || user.profile?.real_name || user.real_name || user.name || user.id]));
+  const { users, profileEmailRedactions } = sanitizeUsers(sourceUsers, redact);
   const channelByNameOrId = new Map<string, SlackChannel>();
   for (const channel of channels) {
     channelByNameOrId.set(channel.name, channel);
@@ -23,7 +25,7 @@ export async function buildIndex(input: string, options: BuildIndexOptions = {})
     const channel = channelByNameOrId.get(channelKey) ?? { id: channelKey, name: channelKey };
     for (const raw of rawMessages) {
       if (!raw.ts) continue;
-      const redacted = redactText(raw.text ?? '', options.redact !== false);
+      const redacted = redactText(raw.text ?? '', redact);
       messages.push({
         id: `${channel.id}:${raw.ts}`,
         channelId: channel.id,
@@ -45,11 +47,23 @@ export async function buildIndex(input: string, options: BuildIndexOptions = {})
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
     source: { path: sourcePath, mode: loaded.mode, network: false },
-    scope: buildScopeReport(users, channels, messages),
+    scope: buildScopeReport(users, channels, messages, profileEmailRedactions),
     users,
     channels,
     messages
   };
+}
+
+function sanitizeUsers(users: SlackUser[], redact: boolean): { users: SlackUser[]; profileEmailRedactions: number } {
+  if (!redact) return { users, profileEmailRedactions: 0 };
+  let profileEmailRedactions = 0;
+  const sanitized = users.map((user) => {
+    if (!user.profile || !('email' in user.profile)) return user;
+    const { email, ...profile } = user.profile;
+    if (typeof email === 'string' && email.length > 0) profileEmailRedactions += 1;
+    return { ...user, profile };
+  });
+  return { users: sanitized, profileEmailRedactions };
 }
 
 function dedupeById<T extends { id: string }>(items: T[]): T[] {
@@ -66,11 +80,12 @@ function ensureChannels(channels: SlackChannel[], messagesByChannel: Map<string,
   return dedupeById(result);
 }
 
-function buildScopeReport(users: SlackUser[], channels: SlackChannel[], messages: CachedMessage[]): ScopeReport {
+function buildScopeReport(users: SlackUser[], channels: SlackChannel[], messages: CachedMessage[], profileEmailRedactions: number): ScopeReport {
   const redactionCounts: Record<string, number> = {};
   for (const message of messages) {
     for (const label of message.redactions) redactionCounts[label] = (redactionCounts[label] ?? 0) + 1;
   }
+  if (profileEmailRedactions > 0) redactionCounts['profile-email'] = profileEmailRedactions;
   return {
     channelCount: channels.length,
     userCount: users.length,
@@ -78,6 +93,6 @@ function buildScopeReport(users: SlackUser[], channels: SlackChannel[], messages
     earliestMessage: messages.at(0)?.isoTime,
     latestMessage: messages.at(-1)?.isoTime,
     redactionCounts,
-    notes: ['No network calls were made.', 'Only local fixture/export files were read.', 'Message text is redacted by default.']
+    notes: ['No network calls were made.', 'Only local fixture/export files were read.', 'Message text and user profile emails are redacted by default.']
   };
 }
