@@ -10,11 +10,18 @@ Slack history is often where decisions, incident context, and handoff notes live
 
 ## Install
 
+Download and install the package attached to a GitHub release:
+
 ```bash
-npm install -g slackcache
+VERSION=0.1.0
+npm install --global "https://github.com/rogerchappel/slackcache/releases/download/v${VERSION}/slackcache-${VERSION}.tgz"
 ```
 
-Or run from this repo:
+The version must have a matching `v${VERSION}` release and
+`slackcache-${VERSION}.tgz` asset. The package is not currently published to
+the npm registry.
+
+Or build and run from this repo:
 
 ```bash
 npm install

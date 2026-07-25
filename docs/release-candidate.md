@@ -20,5 +20,9 @@ The branch records the local release-readiness gate results requested for this r
 
 - [ ] Confirm package metadata and repository links are correct.
 - [ ] Confirm README/usage docs match the current CLI/API surface.
+- [ ] Confirm `package.json` version, the `v<version>` tag, and the attached
+      `slackcache-<version>.tgz` filename match.
+- [ ] Confirm `npm run release:contract` rejects undocumented distribution
+      changes before tagging.
 - [ ] Confirm release notes/changelog are ready for the intended version.
 - [ ] Re-run the release checks in CI or locally before tagging.
