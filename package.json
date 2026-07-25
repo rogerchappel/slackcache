@@ -33,7 +33,8 @@
     "smoke": "bash scripts/smoke.sh",
     "pretest": "npm run build",
     "package:smoke": "bash scripts/package-smoke.sh",
-    "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke"
+    "release:contract": "node scripts/release-contract.mjs",
+    "release:check": "npm run release:contract && npm run check && npm test && npm run smoke && npm run package:smoke"
   },
   "keywords": [
     "slack",
