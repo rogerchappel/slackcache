@@ -32,7 +32,6 @@ async function loadApiFixture(root: string): Promise<LoadedSlackData> {
 async function loadSlackExport(root: string): Promise<LoadedSlackData> {
   const users = await maybeArray<SlackUser>(path.join(root, 'users.json'));
   const channels = await maybeArray<SlackChannel>(path.join(root, 'channels.json'));
-  const knownNames = new Set(channels.map((channel) => channel.name));
   const messagesByChannel = new Map<string, SlackMessage[]>();
   const files = await listJsonFiles(root);
   for (const file of files) {
@@ -40,8 +39,6 @@ async function loadSlackExport(root: string): Promise<LoadedSlackData> {
     const parts = rel.split(path.sep);
     if (parts.length !== 2 || parts[0] === '' || !/^\d{4}-\d{2}-\d{2}\.json$/.test(parts[1])) continue;
     const channelName = parts[0];
-    if (['users.json', 'channels.json'].includes(channelName)) continue;
-    if (knownNames.size > 0 && !knownNames.has(channelName)) continue;
     const messages = await readJson<SlackMessage[]>(file);
     if (!messagesByChannel.has(channelName)) messagesByChannel.set(channelName, []);
     messagesByChannel.get(channelName)!.push(...messages);
