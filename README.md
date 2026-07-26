@@ -56,6 +56,10 @@ export/
   random/2026-05-01.json
 ```
 
+Channel directories containing dated message files are imported even when
+`channels.json` is missing or does not list them. In that case, the directory
+name is used as stable channel metadata.
+
 ### API-style local fixture
 
 ```text
