@@ -19,11 +19,22 @@ export function searchIndex(index: SlackCacheIndex, query: string, options: Sear
 }
 
 export function threadMessages(index: SlackCacheIndex, ts: string, channel?: string) {
-  const root = index.messages.find((message) => message.ts === ts && (!channel || message.channelName === channel || message.channelId === channel));
+  const roots = index.messages.filter((message) => message.ts === ts && (!channel || matchesChannel(message, channel)));
+  const rootChannels = [...new Map(roots.map((message) => [message.channelId, message])).values()];
+  if (!channel && rootChannels.length > 1) {
+    const channels = rootChannels.map((message) => message.channelName).sort().join(', ');
+    throw new Error(`Timestamp ${ts} matches threads in multiple channels (${channels}). Retry with --channel <name-or-id>.`);
+  }
+  const root = roots[0];
   const threadTs = root?.threadTs ?? root?.ts ?? ts;
+  const resolvedChannel = channel ?? root?.channelId;
   return index.messages
-    .filter((message) => (message.ts === threadTs || message.threadTs === threadTs) && (!channel || message.channelName === channel || message.channelId === channel))
+    .filter((message) => (message.ts === threadTs || message.threadTs === threadTs) && (!resolvedChannel || matchesChannel(message, resolvedChannel)))
     .sort((a, b) => a.ts.localeCompare(b.ts));
+}
+
+function matchesChannel(message: SlackCacheIndex['messages'][number], channel: string): boolean {
+  return message.channelName === channel || message.channelId === channel;
 }
 
 function occurrences(text: string, term: string): number {
