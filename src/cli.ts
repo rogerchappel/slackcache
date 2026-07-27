@@ -77,7 +77,7 @@ function numberOpt(value: string | boolean | string[] | undefined): number | und
 }
 
 function printHelp(): void {
-  console.log(`slackcache — local-first Slack archive cache\n\nUsage:\n  slackcache import <export-dir> --output ./.slackcache\n  slackcache inspect <export-dir> --output ./.slackcache\n  slackcache scope --index ./.slackcache\n  slackcache search "deploy key" --index ./.slackcache [--channel general] [--limit 5]\n  slackcache thread <slack-ts> --index ./.slackcache [--channel general]\n\nDefaults are privacy-first: local files only, redaction on, no network calls.`);
+  console.log(`slackcache — local-first Slack archive cache\n\nUsage:\n  slackcache import <export-dir> --output ./.slackcache\n  slackcache inspect <export-dir> --output ./.slackcache\n  slackcache scope --index ./.slackcache\n  slackcache search "deploy key" --index ./.slackcache [--channel general] [--limit 5]\n  slackcache thread <slack-ts> --index ./.slackcache [--channel general]\n\nThread lookup infers the channel when the timestamp is unique. If multiple channels share a timestamp, pass --channel with a channel name or ID.\n\nDefaults are privacy-first: local files only, redaction on, no network calls.`);
 }
 
 main().catch((error: unknown) => {

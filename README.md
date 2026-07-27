@@ -38,6 +38,12 @@ slackcache search "deploy" --index ./.slackcache --channel general --limit 5
 slackcache thread 1777586400.000100 --index ./.slackcache --channel general
 ```
 
+For `thread`, `--channel` is optional when the timestamp identifies a message
+in only one channel; slackcache then keeps the root and replies within that
+inferred channel. If the same timestamp exists in multiple channels, the
+command stops instead of combining their conversations. Retry with
+`--channel <name-or-id>` to select the intended thread.
+
 `inspect` is an alias for `import` for PRD compatibility:
 
 ```bash

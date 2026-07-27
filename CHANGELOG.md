@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Omit user profile emails from caches under default redaction and include them in scope reporting as `profile-email` redactions.
+- Keep thread results within the selected root channel and require `--channel` when a timestamp is ambiguous across channels.
 
 ## 0.1.0
 
