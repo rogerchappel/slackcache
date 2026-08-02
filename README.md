@@ -38,6 +38,11 @@ slackcache search "deploy" --index ./.slackcache --channel general --limit 5
 slackcache thread 1777586400.000100 --index ./.slackcache --channel general
 ```
 
+`search --limit <count>` accepts a complete positive safe integer (for
+example, `1` or `25`). Zero, negative numbers, decimals, trailing characters,
+missing values, and values larger than JavaScript's safe-integer range are
+rejected with a nonzero exit status.
+
 For `thread`, `--channel` is optional when the timestamp identifies a message
 in only one channel; slackcache then keeps the root and replies within that
 inferred channel. If the same timestamp exists in multiple channels, the
