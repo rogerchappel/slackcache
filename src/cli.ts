@@ -71,13 +71,19 @@ function stringOpt(value: string | boolean | string[] | undefined): string | und
 }
 
 function numberOpt(value: string | boolean | string[] | undefined): number | undefined {
-  if (typeof value !== 'string') return undefined;
-  const parsed = Number.parseInt(value, 10);
-  return Number.isFinite(parsed) ? parsed : undefined;
+  if (value === undefined) return undefined;
+  if (typeof value !== 'string' || !/^[1-9]\d*$/.test(value)) {
+    throw new Error('--limit must be a positive integer');
+  }
+  const parsed = Number(value);
+  if (!Number.isSafeInteger(parsed)) {
+    throw new Error('--limit must be a positive safe integer');
+  }
+  return parsed;
 }
 
 function printHelp(): void {
-  console.log(`slackcache — local-first Slack archive cache\n\nUsage:\n  slackcache import <export-dir> --output ./.slackcache\n  slackcache inspect <export-dir> --output ./.slackcache\n  slackcache scope --index ./.slackcache\n  slackcache search "deploy key" --index ./.slackcache [--channel general] [--limit 5]\n  slackcache thread <slack-ts> --index ./.slackcache [--channel general]\n\nThread lookup infers the channel when the timestamp is unique. If multiple channels share a timestamp, pass --channel with a channel name or ID.\n\nDefaults are privacy-first: local files only, redaction on, no network calls.`);
+  console.log(`slackcache — local-first Slack archive cache\n\nUsage:\n  slackcache import <export-dir> --output ./.slackcache\n  slackcache inspect <export-dir> --output ./.slackcache\n  slackcache scope --index ./.slackcache\n  slackcache search "deploy key" --index ./.slackcache [--channel general] [--limit 5]\n  slackcache thread <slack-ts> --index ./.slackcache [--channel general]\n\nSearch options:\n  --limit <count>  Maximum results; count must be a positive safe integer.\n\nThread lookup infers the channel when the timestamp is unique. If multiple channels share a timestamp, pass --channel with a channel name or ID.\n\nDefaults are privacy-first: local files only, redaction on, no network calls.`);
 }
 
 main().catch((error: unknown) => {
