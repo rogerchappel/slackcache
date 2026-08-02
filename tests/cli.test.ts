@@ -22,6 +22,51 @@ test('CLI imports and searches fixture data', async () => {
   }
 });
 
+test('CLI limits search results with a positive integer', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-cli-'));
+  try {
+    await execFileAsync('node', ['dist/src/cli.js', 'import', 'fixtures/sample', '--output', dir]);
+    const result = await execFileAsync(
+      'node',
+      ['dist/src/cli.js', 'search', 'deploy', '--index', dir, '--limit', '1'],
+    );
+    assert.equal(result.stdout.match(/^\d{4}-\d{2}-\d{2}T/gm)?.length, 1);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('CLI rejects invalid search limits', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-cli-'));
+  try {
+    await execFileAsync('node', ['dist/src/cli.js', 'import', 'fixtures/sample', '--output', dir]);
+    const invalidLimits = [
+      { args: ['--limit'], message: /--limit must be a positive integer/ },
+      { args: ['--limit', '0'], message: /--limit must be a positive integer/ },
+      { args: ['--limit', '-1'], message: /--limit must be a positive integer/ },
+      { args: ['--limit', '1x'], message: /--limit must be a positive integer/ },
+      { args: ['--limit', '1.5'], message: /--limit must be a positive integer/ },
+      { args: ['--limit', '9007199254740992'], message: /--limit must be a positive safe integer/ },
+    ];
+
+    for (const invalid of invalidLimits) {
+      await assert.rejects(
+        execFileAsync(
+          'node',
+          ['dist/src/cli.js', 'search', 'deploy', '--index', dir, ...invalid.args],
+        ),
+        (error: Error & { code?: number; stderr?: string }) => {
+          assert.notEqual(error.code, 0);
+          assert.match(error.stderr ?? '', invalid.message);
+          return true;
+        },
+      );
+    }
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test('CLI explains how to disambiguate a timestamp shared by channels', async () => {
   const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-cli-'));
   try {
