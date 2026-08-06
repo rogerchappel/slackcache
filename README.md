@@ -82,6 +82,12 @@ fixture/
 
 No Slack API requests are made in V1.
 
+Each imported message must have a Slack timestamp made of digits, a decimal
+point, and fractional digits (for example, `1777586400.000100`). Import stops
+with a nonzero exit status when a timestamp is malformed or non-finite. The
+error identifies the source path, channel, and message position; invalid
+records are never indexed or represented as an epoch date.
+
 ## Privacy and safety
 
 - Redaction is on by default for emails in message text and user `profile.email` fields, plus URLs, Slack-token-shaped strings, and generic `token=...` / `secret=...` patterns in message text. Profile emails are omitted from the cache; user IDs and non-sensitive names remain available.
