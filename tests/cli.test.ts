@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
@@ -19,6 +19,29 @@ test('CLI imports and searches fixture data', async () => {
     assert.match(searchResult.stdout, /local runbook/);
   } finally {
     await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('CLI import reports malformed Slack timestamps without writing an epoch range', async () => {
+  const fixtureDir = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-ts-'));
+  const outputDir = await mkdtemp(path.join(tmpdir(), 'slackcache-cli-'));
+  try {
+    await writeFile(path.join(fixtureDir, 'messages.json'), JSON.stringify([
+      { channel: 'general', ts: 'not-a-timestamp', text: 'deploy update' },
+    ]));
+
+    await assert.rejects(
+      execFileAsync('node', ['dist/src/cli.js', 'import', fixtureDir, '--output', outputDir]),
+      (error: Error & { stderr?: string }) => {
+        assert.match(error.stderr ?? '', /Invalid Slack timestamp "not-a-timestamp"/);
+        assert.match(error.stderr ?? '', /general, message 1/);
+        assert.doesNotMatch(error.stderr ?? '', /1970-01-01/);
+        return true;
+      },
+    );
+  } finally {
+    await rm(fixtureDir, { recursive: true, force: true });
+    await rm(outputDir, { recursive: true, force: true });
   }
 });
 

@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { loadSlackSource } from './loader.js';
 import { redactText } from './redact.js';
-import { compareSlackTs, slackTsToIso } from './time.js';
+import { compareSlackTs, isSlackTimestamp, slackTsToIso } from './time.js';
 import type { CachedMessage, ScopeReport, SlackCacheIndex, SlackChannel, SlackUser } from './types.js';
 
 export type BuildIndexOptions = { redact?: boolean };
@@ -23,8 +23,14 @@ export async function buildIndex(input: string, options: BuildIndexOptions = {})
   const messages: CachedMessage[] = [];
   for (const [channelKey, rawMessages] of loaded.messagesByChannel) {
     const channel = channelByNameOrId.get(channelKey) ?? { id: channelKey, name: channelKey };
-    for (const raw of rawMessages) {
+    for (const [messageIndex, raw] of rawMessages.entries()) {
       if (!raw.ts) continue;
+      if (!isSlackTimestamp(raw.ts)) {
+        throw new Error(
+          `Invalid Slack timestamp "${String(raw.ts)}" in ${sourcePath} (${channelKey}, message ${messageIndex + 1}): ` +
+          'expected digits followed by a decimal point and fractional digits (for example, "1777586400.000100").',
+        );
+      }
       const redacted = redactText(raw.text ?? '', redact);
       messages.push({
         id: `${channel.id}:${raw.ts}`,
