@@ -43,6 +43,11 @@ example, `1` or `25`). Zero, negative numbers, decimals, trailing characters,
 missing values, and values larger than JavaScript's safe-integer range are
 rejected with a nonzero exit status.
 
+The CLI rejects misspelled or command-inappropriate options and unexpected
+positional arguments with a nonzero exit status. Argument validation happens
+before any cache index is read or written. Multiword positional search queries
+remain supported, as do the documented `-o`, `--output`, and `inspect` aliases.
+
 For `thread`, `--channel` is optional when the timestamp identifies a message
 in only one channel; slackcache then keeps the root and replies within that
 inferred channel. If the same timestamp exists in multiple channels, the

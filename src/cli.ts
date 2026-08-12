@@ -6,9 +6,12 @@ import { loadIndex, saveIndex } from './store.js';
 
 type Args = { _: string[] } & { [key: string]: string | boolean | string[] | undefined };
 
+const valueOptions = new Set(['input', 'output', 'o', 'redact', 'index', 'query', 'channel', 'limit', 'ts']);
+
 async function main(argv = process.argv.slice(2)): Promise<void> {
   const args = parseArgs(argv);
   const command = args._[0];
+  validateArgs(command, args);
   if (!command || args.help || args.h) return printHelp();
 
   if (command === 'import' || command === 'inspect') {
@@ -57,13 +60,37 @@ function parseArgs(argv: string[]): Args {
     }
     const key = token.replace(/^--?/, '');
     const next = argv[i + 1];
-    if (!next || next.startsWith('-')) out[key] = true;
+    if (!next || (next.startsWith('-') && !valueOptions.has(key))) out[key] = true;
     else {
       out[key] = next;
       i += 1;
     }
   }
   return out;
+}
+
+const commandOptions: Record<string, Set<string>> = {
+  import: new Set(['input', 'output', 'o', 'redact']),
+  inspect: new Set(['input', 'output', 'o', 'redact']),
+  scope: new Set(['index', 'output', 'o']),
+  search: new Set(['query', 'index', 'output', 'o', 'channel', 'limit']),
+  thread: new Set(['ts', 'index', 'output', 'o', 'channel']),
+};
+
+function validateArgs(command: string | undefined, args: Args): void {
+  const allowed = command ? commandOptions[command] : new Set<string>();
+  if (command && !allowed) throw new Error(`Unknown command: ${command}`);
+
+  for (const option of Object.keys(args).filter((key) => key !== '_')) {
+    if (option === 'help' || option === 'h') continue;
+    if (!allowed?.has(option)) throw new Error(`Unknown option${command ? ` for ${command}` : ''}: --${option}`);
+  }
+
+  if (!command) return;
+  const maximumPositionals = command === 'search' ? Number.POSITIVE_INFINITY : command === 'scope' ? 1 : 2;
+  if (args._.length > maximumPositionals) {
+    throw new Error(`${command} received unexpected argument: ${args._[maximumPositionals]}`);
+  }
 }
 
 function stringOpt(value: string | boolean | string[] | undefined): string | undefined {
