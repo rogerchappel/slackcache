@@ -36,8 +36,8 @@ test('discovers export channels missing from channels.json', async () => {
   ]);
 });
 
-test('rejects malformed and non-finite Slack message timestamps with source context', async () => {
-  for (const timestamp of ['not-a-timestamp', '1e999']) {
+test('rejects missing, non-string, malformed, and non-finite Slack timestamps with source context', async () => {
+  for (const timestamp of [undefined, 123, 'not-a-timestamp', '1e999']) {
     const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-ts-'));
     try {
       await mkdir(path.join(dir, 'general'));
@@ -49,13 +49,27 @@ test('rejects malformed and non-finite Slack message timestamps with source cont
       await assert.rejects(
         buildIndex(dir),
         (error: Error) => {
-          assert.match(error.message, new RegExp(`Invalid Slack timestamp "${timestamp}"`));
+          const rendered = typeof timestamp === 'string' ? `"${timestamp}"` : String(timestamp);
+          assert.match(error.message, new RegExp(`Invalid Slack timestamp ${rendered}`));
           assert.match(error.message, /general, message 1/);
           assert.match(error.message, new RegExp(dir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
           assert.match(error.message, /digits followed by a decimal point and fractional digits/);
           return true;
         },
       );
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }
+});
+
+test('rejects non-array API, export, users, and channels JSON files', async () => {
+  for (const relativeFile of ['messages.json', 'users.json', 'channels.json', 'general/2026-05-01.json']) {
+    const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-shape-'));
+    try {
+      if (relativeFile.includes('/')) await mkdir(path.join(dir, 'general'));
+      await writeFile(path.join(dir, relativeFile), JSON.stringify({ invalid: true }));
+      await assert.rejects(buildIndex(dir), /top-level JSON array/);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }

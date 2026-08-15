@@ -24,10 +24,10 @@ export async function buildIndex(input: string, options: BuildIndexOptions = {})
   for (const [channelKey, rawMessages] of loaded.messagesByChannel) {
     const channel = channelByNameOrId.get(channelKey) ?? { id: channelKey, name: channelKey };
     for (const [messageIndex, raw] of rawMessages.entries()) {
-      if (!raw.ts) continue;
       if (!isSlackTimestamp(raw.ts)) {
+        const timestamp = typeof raw.ts === 'string' ? `"${raw.ts}"` : String(raw.ts);
         throw new Error(
-          `Invalid Slack timestamp "${String(raw.ts)}" in ${sourcePath} (${channelKey}, message ${messageIndex + 1}): ` +
+          `Invalid Slack timestamp ${timestamp} in ${sourcePath} (${channelKey}, message ${messageIndex + 1}): ` +
           'expected digits followed by a decimal point and fractional digits (for example, "1777586400.000100").',
         );
       }

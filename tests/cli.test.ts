@@ -112,6 +112,27 @@ test('CLI import reports malformed Slack timestamps without writing an epoch ran
   }
 });
 
+test('CLI rejects missing timestamps and malformed input shapes without writing an index', async () => {
+  for (const input of [[{ channel: 'general', text: 'missing timestamp' }], { invalid: true }]) {
+    const fixtureDir = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-input-'));
+    const outputDir = path.join(fixtureDir, 'output');
+    try {
+      await writeFile(path.join(fixtureDir, 'messages.json'), JSON.stringify(input));
+      await assert.rejects(
+        execFileAsync('node', ['dist/src/cli.js', 'import', fixtureDir, '--output', outputDir]),
+        (error: Error & { code?: number; stderr?: string }) => {
+          assert.notEqual(error.code, 0);
+          assert.match(error.stderr ?? '', /(?:Invalid Slack timestamp undefined.*general, message 1|messages\.json.*top-level JSON array)/);
+          return true;
+        },
+      );
+      assert.equal(await pathExists(path.join(outputDir, 'index.json')), false);
+    } finally {
+      await rm(fixtureDir, { recursive: true, force: true });
+    }
+  }
+});
+
 test('CLI limits search results with a positive integer', async () => {
   const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-cli-'));
   try {
