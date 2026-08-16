@@ -62,6 +62,14 @@ slackcache inspect ./fixtures/sample --output ./out
 
 ## Supported input shapes
 
+Every JSON file shown below must contain a top-level array. `users.json` and
+`channels.json` may be omitted, but malformed files are rejected rather than
+treated as empty metadata. Every message must contain a Slack timestamp as a
+string in `digits.fraction` form (for example, `"1777586400.000100"`). Missing,
+non-string, or malformed timestamps stop the import with source, channel, and
+message-position context. Validation completes before the index is written, and
+all validation failures produce a nonzero CLI exit status.
+
 ### Slack export directory
 
 ```text
