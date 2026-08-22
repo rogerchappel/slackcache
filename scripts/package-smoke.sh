@@ -24,4 +24,10 @@ grep -q 'Messages: 4' "$tmp/import.txt"
 ./node_modules/.bin/slackcache search deploy --index "$tmp/cache" --channel general --limit 1 > "$tmp/search.txt"
 grep -q '#general' "$tmp/search.txt"
 
+package_root="$tmp/app/node_modules/slackcache"
+for example in "$package_root"/examples/*.sh; do
+  example_tmp="$(mktemp -d "$tmp/example.XXXXXX")"
+  TMPDIR="$example_tmp" bash "$example" >/dev/null
+done
+
 echo 'slackcache package smoke passed'

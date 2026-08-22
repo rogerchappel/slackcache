@@ -121,12 +121,18 @@ The workflow is intentionally reviewable: import scope first, search narrow, ins
 
 ## Runnable demo
 
-After building the local CLI, run the fixture-backed handoff demo:
+The scripts in `examples/` run against the bundled `dist` CLI and fixtures.
+In a source checkout, build once after installing dependencies, then run any
+demo from the repository root:
 
 ```bash
 npm run build
 bash examples/local-handoff-demo.sh
 ```
+
+In an installed package, no build tools or dev dependencies are needed; run
+the same scripts directly from that package's `examples/` directory. Both the
+sample and API-shaped fixtures used by the demos are included in the package.
 
 The script imports `fixtures/sample`, prints the scope report, searches for a deploy handoff, and opens the matching thread from a temporary local cache.
 

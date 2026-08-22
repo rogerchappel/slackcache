@@ -19,6 +19,7 @@
     "docs",
     "examples",
     "fixtures/sample",
+    "fixtures/api",
     "README.md",
     "LICENSE",
     "SECURITY.md",
