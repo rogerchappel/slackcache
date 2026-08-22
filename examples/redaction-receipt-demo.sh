@@ -10,12 +10,9 @@ THREAD_LOG="$OUT_DIR/thread.txt"
 rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR"
 
-cd "$ROOT_DIR"
-npm run build >/dev/null
-
-node dist/src/cli.js import fixtures/sample --output "$OUT_DIR/cache" >"$IMPORT_LOG"
-node dist/src/cli.js search deploy --index "$OUT_DIR/cache" --channel general --limit 5 >"$SEARCH_LOG"
-node dist/src/cli.js thread 1777586400.000100 --index "$OUT_DIR/cache" --channel general >"$THREAD_LOG"
+node "$ROOT_DIR/dist/src/cli.js" import "$ROOT_DIR/fixtures/sample" --output "$OUT_DIR/cache" >"$IMPORT_LOG"
+node "$ROOT_DIR/dist/src/cli.js" search deploy --index "$OUT_DIR/cache" --channel general --limit 5 >"$SEARCH_LOG"
+node "$ROOT_DIR/dist/src/cli.js" thread 1777586400.000100 --index "$OUT_DIR/cache" --channel general >"$THREAD_LOG"
 
 grep -Fq "Messages: 4" "$IMPORT_LOG"
 grep -Fq "Redactions: slack-token=1, generic-token=1, url=1, email=1" "$IMPORT_LOG"

@@ -7,12 +7,9 @@ OUT_DIR="${TMPDIR:-/tmp}/slackcache-incident-clip"
 
 rm -rf "$CACHE_DIR" "$OUT_DIR"
 mkdir -p "$OUT_DIR"
-cd "$ROOT_DIR"
-
-npm run build
-node dist/src/cli.js import fixtures/api --output "$CACHE_DIR" > "$OUT_DIR/import.txt"
-node dist/src/cli.js search "auth panic" --index "$CACHE_DIR" --channel agent-handoff --limit 3 > "$OUT_DIR/search.txt"
-node dist/src/cli.js thread 1777672800.000100 --index "$CACHE_DIR" --channel agent-handoff > "$OUT_DIR/thread.txt"
+node "$ROOT_DIR/dist/src/cli.js" import "$ROOT_DIR/fixtures/api" --output "$CACHE_DIR" > "$OUT_DIR/import.txt"
+node "$ROOT_DIR/dist/src/cli.js" search "auth panic" --index "$CACHE_DIR" --channel agent-handoff --limit 3 > "$OUT_DIR/search.txt"
+node "$ROOT_DIR/dist/src/cli.js" thread 1777672800.000100 --index "$CACHE_DIR" --channel agent-handoff > "$OUT_DIR/thread.txt"
 
 test -s "$OUT_DIR/import.txt"
 test -s "$OUT_DIR/search.txt"

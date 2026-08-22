@@ -7,12 +7,9 @@ OUT_DIR="${TMPDIR:-/tmp}/slackcache-scope-report"
 
 rm -rf "$CACHE_DIR" "$OUT_DIR"
 mkdir -p "$OUT_DIR"
-cd "$ROOT_DIR"
-
-npm run build
-node dist/src/cli.js import fixtures/sample --output "$CACHE_DIR" >"$OUT_DIR/import.txt"
-node dist/src/cli.js scope --index "$CACHE_DIR" >"$OUT_DIR/scope.txt"
-node dist/src/cli.js search deploy --index "$CACHE_DIR" --channel general --limit 2 >"$OUT_DIR/search.txt"
+node "$ROOT_DIR/dist/src/cli.js" import "$ROOT_DIR/fixtures/sample" --output "$CACHE_DIR" >"$OUT_DIR/import.txt"
+node "$ROOT_DIR/dist/src/cli.js" scope --index "$CACHE_DIR" >"$OUT_DIR/scope.txt"
+node "$ROOT_DIR/dist/src/cli.js" search deploy --index "$CACHE_DIR" --channel general --limit 2 >"$OUT_DIR/search.txt"
 
 test -s "$OUT_DIR/import.txt"
 test -s "$OUT_DIR/scope.txt"
