@@ -65,10 +65,12 @@ slackcache inspect ./fixtures/sample --output ./out
 Every JSON file shown below must contain a top-level array. `users.json` and
 `channels.json` may be omitted, but malformed files are rejected rather than
 treated as empty metadata. Every message must contain a Slack timestamp as a
-string in `digits.fraction` form (for example, `"1777586400.000100"`). Missing,
-non-string, or malformed timestamps stop the import with source, channel, and
-message-position context. Validation completes before the index is written, and
-all validation failures produce a nonzero CLI exit status.
+string in `digits.fraction` form (for example, `"1777586400.000100"`). When
+`thread_ts` is present, it must use the same form. Missing, non-string, or
+malformed message timestamps and malformed thread timestamps stop the import
+with source, channel, and message-position context. Validation completes before
+the index is written, and all validation failures produce a nonzero CLI exit
+status.
 
 ### Slack export directory
 
@@ -96,10 +98,11 @@ fixture/
 No Slack API requests are made in V1.
 
 Each imported message must have a Slack timestamp made of digits, a decimal
-point, and fractional digits (for example, `1777586400.000100`). Import stops
-with a nonzero exit status when a timestamp is malformed or non-finite. The
-error identifies the source path, channel, and message position; invalid
-records are never indexed or represented as an epoch date.
+point, and fractional digits (for example, `1777586400.000100`); any present
+`thread_ts` must satisfy the same contract. Import stops with a nonzero exit
+status when either timestamp is malformed or non-finite. The error identifies
+the source path, channel, and message position; invalid records are never
+indexed or represented as an epoch date.
 
 ## Privacy and safety
 

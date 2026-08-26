@@ -31,6 +31,13 @@ export async function buildIndex(input: string, options: BuildIndexOptions = {})
           'expected digits followed by a decimal point and fractional digits (for example, "1777586400.000100").',
         );
       }
+      if (raw.thread_ts !== undefined && !isSlackTimestamp(raw.thread_ts)) {
+        const timestamp = typeof raw.thread_ts === 'string' ? `"${raw.thread_ts}"` : String(raw.thread_ts);
+        throw new Error(
+          `Invalid Slack thread timestamp ${timestamp} in ${sourcePath} (${channelKey}, message ${messageIndex + 1}): ` +
+          'expected digits followed by a decimal point and fractional digits (for example, "1777586400.000100").',
+        );
+      }
       const redacted = redactText(raw.text ?? '', redact);
       messages.push({
         id: `${channel.id}:${raw.ts}`,
