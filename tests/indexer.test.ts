@@ -63,6 +63,37 @@ test('rejects missing, non-string, malformed, and non-finite Slack timestamps wi
   }
 });
 
+test('rejects malformed thread timestamps in API fixtures and exports with source context', async () => {
+  for (const mode of ['api-fixture', 'export'] as const) {
+    const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-thread-ts-'));
+    try {
+      const messages = [
+        { channel: 'general', ts: '1777586400.000100', text: 'root' },
+        { channel: 'general', ts: '1777586401.000100', thread_ts: 'not-a-timestamp', text: 'reply' },
+      ];
+      if (mode === 'api-fixture') {
+        await writeFile(path.join(dir, 'messages.json'), JSON.stringify(messages));
+      } else {
+        await mkdir(path.join(dir, 'general'));
+        await writeFile(path.join(dir, 'general', '2026-05-01.json'), JSON.stringify(messages));
+      }
+
+      await assert.rejects(
+        buildIndex(dir),
+        (error: Error) => {
+          assert.match(error.message, /Invalid Slack thread timestamp "not-a-timestamp"/);
+          assert.match(error.message, /general, message 2/);
+          assert.match(error.message, new RegExp(dir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+          assert.match(error.message, /digits followed by a decimal point and fractional digits/);
+          return true;
+        },
+      );
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }
+});
+
 test('rejects non-array API, export, users, and channels JSON files', async () => {
   for (const relativeFile of ['messages.json', 'users.json', 'channels.json', 'general/2026-05-01.json']) {
     const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-shape-'));
