@@ -70,7 +70,9 @@ string in `digits.fraction` form (for example, `"1777586400.000100"`). When
 malformed message timestamps and malformed thread timestamps stop the import
 with source, channel, and message-position context. Validation completes before
 the index is written, and all validation failures produce a nonzero CLI exit
-status.
+status. Timestamp ordering uses exact decimal comparisons at the supplied
+fractional precision: indexes and threads are oldest-first, while equally
+relevant search results are newest-first.
 
 ### Slack export directory
 
