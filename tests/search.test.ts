@@ -52,6 +52,17 @@ test('rejects an ambiguous root timestamp unless a channel is supplied', async (
   );
 });
 
+test('uses exact timestamp order for search recency and thread chronology', async () => {
+  const index = await buildIndex('fixtures/sample');
+  const root = { ...index.messages[0]!, id: 'C001:9.900000', ts: '9.900000', text: 'matching root', threadTs: undefined };
+  const olderReply = { ...root, id: 'C001:10.100000000000000000', ts: '10.100000000000000000', text: 'matching reply', threadTs: root.ts };
+  const newerReply = { ...root, id: 'C001:10.100000000000000001', ts: '10.100000000000000001', text: 'matching reply', threadTs: root.ts };
+  const preciseIndex = withMessages(index, [newerReply, root, olderReply]);
+
+  assert.deepEqual(searchIndex(preciseIndex, 'matching').map((hit) => hit.ts), [newerReply.ts, olderReply.ts, root.ts]);
+  assert.deepEqual(threadMessages(preciseIndex, root.ts).map((message) => message.ts), [root.ts, olderReply.ts, newerReply.ts]);
+});
+
 function withMessages(index: SlackCacheIndex, messages: SlackCacheIndex['messages']): SlackCacheIndex {
   return { ...index, messages };
 }
