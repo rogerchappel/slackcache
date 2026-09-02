@@ -1,4 +1,5 @@
 import type { SearchHit, SlackCacheIndex } from './types.js';
+import { compareSlackTs } from './time.js';
 
 export type SearchOptions = { channel?: string; limit?: number };
 
@@ -14,7 +15,7 @@ export function searchIndex(index: SlackCacheIndex, query: string, options: Sear
       return { ...message, score, snippet: snippet(message.text, terms[0]) };
     })
     .filter((hit) => hit.score > 0)
-    .sort((a, b) => b.score - a.score || b.ts.localeCompare(a.ts))
+    .sort((a, b) => b.score - a.score || compareSlackTs(b.ts, a.ts))
     .slice(0, limit);
 }
 
@@ -30,7 +31,7 @@ export function threadMessages(index: SlackCacheIndex, ts: string, channel?: str
   const resolvedChannel = channel ?? root?.channelId;
   return index.messages
     .filter((message) => (message.ts === threadTs || message.threadTs === threadTs) && (!resolvedChannel || matchesChannel(message, resolvedChannel)))
-    .sort((a, b) => a.ts.localeCompare(b.ts));
+    .sort((a, b) => compareSlackTs(a.ts, b.ts));
 }
 
 function matchesChannel(message: SlackCacheIndex['messages'][number], channel: string): boolean {
