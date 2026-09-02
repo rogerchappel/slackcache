@@ -21,6 +21,26 @@ test('builds an API fixture index without network calls', async () => {
   assert.equal(index.messages[0]?.channelName, 'agent-handoff');
 });
 
+test('orders valid Slack timestamps without losing integer or fractional precision', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-timestamp-order-'));
+  try {
+    await writeFile(path.join(dir, 'messages.json'), JSON.stringify([
+      { channel: 'general', text: 'largest fraction', ts: '10.100000000000000001' },
+      { channel: 'general', text: 'single-digit seconds', ts: '9.900000' },
+      { channel: 'general', text: 'smaller fraction', ts: '10.100000000000000000' },
+    ]));
+
+    const index = await buildIndex(dir);
+    assert.deepEqual(index.messages.map((message) => message.ts), [
+      '9.900000',
+      '10.100000000000000000',
+      '10.100000000000000001',
+    ]);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test('discovers export channels missing from channels.json', async () => {
   const index = await buildIndex('fixtures/incomplete-channels');
 
