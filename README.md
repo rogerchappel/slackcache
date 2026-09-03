@@ -45,8 +45,11 @@ rejected with a nonzero exit status.
 
 The CLI rejects misspelled or command-inappropriate options and unexpected
 positional arguments with a nonzero exit status. Argument validation happens
-before any cache index is read or written. Multiword positional search queries
-remain supported, as do the documented `-o`, `--output`, and `inspect` aliases.
+before any cache index is read or written. Every value-taking option also
+requires an explicit value; for example, a trailing `--output`, `--index`, or
+`--channel` is a usage error. Multiword positional search queries remain
+supported, as do valid `--redact false` and the documented `-o`, `--output`,
+and `inspect` aliases.
 
 For `thread`, `--channel` is optional when the timestamp identifies a message
 in only one channel; slackcache then keeps the root and replies within that

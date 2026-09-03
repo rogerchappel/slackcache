@@ -60,11 +60,13 @@ function parseArgs(argv: string[]): Args {
     }
     const key = token.replace(/^--?/, '');
     const next = argv[i + 1];
-    if (!next || (next.startsWith('-') && !valueOptions.has(key))) out[key] = true;
-    else {
+    if (valueOptions.has(key)) {
+      if (!next || (next.startsWith('-') && !(key === 'limit' && /^-\d/.test(next)))) {
+        throw new Error(`${token} requires a value`);
+      }
       out[key] = next;
       i += 1;
-    }
+    } else out[key] = true;
   }
   return out;
 }
@@ -110,7 +112,7 @@ function numberOpt(value: string | boolean | string[] | undefined): number | und
 }
 
 function printHelp(): void {
-  console.log(`slackcache — local-first Slack archive cache\n\nUsage:\n  slackcache import <export-dir> --output ./.slackcache\n  slackcache inspect <export-dir> --output ./.slackcache\n  slackcache scope --index ./.slackcache\n  slackcache search "deploy key" --index ./.slackcache [--channel general] [--limit 5]\n  slackcache thread <slack-ts> --index ./.slackcache [--channel general]\n\nSearch options:\n  --limit <count>  Maximum results; count must be a positive safe integer.\n\nThread lookup infers the channel when the timestamp is unique. If multiple channels share a timestamp, pass --channel with a channel name or ID.\n\nDefaults are privacy-first: local files only, redaction on, no network calls.`);
+  console.log(`slackcache — local-first Slack archive cache\n\nUsage:\n  slackcache import <export-dir> --output ./.slackcache\n  slackcache inspect <export-dir> --output ./.slackcache\n  slackcache scope --index ./.slackcache\n  slackcache search "deploy key" --index ./.slackcache [--channel general] [--limit 5]\n  slackcache thread <slack-ts> --index ./.slackcache [--channel general]\n\nSearch options:\n  --limit <count>  Maximum results; count must be a positive safe integer.\n\nEvery value-taking option requires its value. Missing values are usage errors.\n\nThread lookup infers the channel when the timestamp is unique. If multiple channels share a timestamp, pass --channel with a channel name or ID.\n\nDefaults are privacy-first: local files only, redaction on, no network calls.`);
 }
 
 main().catch((error: unknown) => {
