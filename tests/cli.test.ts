@@ -64,6 +64,31 @@ test('CLI rejects unknown options before writing an index', async () => {
   }
 });
 
+test('CLI rejects missing option values before reading or writing an index', async () => {
+  const cwd = await mkdtemp(path.join(tmpdir(), 'slackcache-cli-missing-value-'));
+  try {
+    for (const args of [
+      ['import', path.resolve('fixtures/sample'), '--output'],
+      ['search', 'deploy', '--index'],
+      ['search', 'deploy', '--channel'],
+    ]) {
+      const option = args.at(-1)!;
+      await assert.rejects(
+        execFileAsync('node', [path.resolve('dist/src/cli.js'), ...args], { cwd }),
+        (error: Error & { code?: number; stderr?: string }) => {
+          assert.notEqual(error.code, 0);
+          assert.match(error.stderr ?? '', new RegExp(`${option} requires a value`));
+          return true;
+        },
+      );
+      assert.equal(await pathExists(path.join(cwd, 'true')), false);
+      assert.equal(await pathExists(path.join(cwd, '.slackcache')), false);
+    }
+  } finally {
+    await rm(cwd, { recursive: true, force: true });
+  }
+});
+
 test('CLI rejects surplus command arguments before reading or writing an index', async () => {
   const cwd = await mkdtemp(path.join(tmpdir(), 'slackcache-cli-invalid-'));
   const requestedOutput = path.join(cwd, 'requested');
@@ -176,7 +201,7 @@ test('CLI rejects invalid search limits', async () => {
   try {
     await execFileAsync('node', ['dist/src/cli.js', 'import', 'fixtures/sample', '--output', dir]);
     const invalidLimits = [
-      { args: ['--limit'], message: /--limit must be a positive integer/ },
+      { args: ['--limit'], message: /--limit requires a value/ },
       { args: ['--limit', '0'], message: /--limit must be a positive integer/ },
       { args: ['--limit', '-1'], message: /--limit must be a positive integer/ },
       { args: ['--limit', '1x'], message: /--limit must be a positive integer/ },
