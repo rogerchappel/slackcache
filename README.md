@@ -55,7 +55,9 @@ For `thread`, `--channel` is optional when the timestamp identifies a message
 in only one channel; slackcache then keeps the root and replies within that
 inferred channel. If the same timestamp exists in multiple channels, the
 command stops instead of combining their conversations. Retry with
-`--channel <name-or-id>` to select the intended thread.
+`--channel <name-or-id>` to select the intended thread. The query timestamp
+must use Slack's `digits.fraction` form; malformed or non-finite values are
+rejected with a nonzero exit before the cache is read.
 
 `inspect` is an alias for `import` for PRD compatibility:
 
