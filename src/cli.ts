@@ -3,6 +3,7 @@ import { buildIndex } from './indexer.js';
 import { renderHits, renderScope, renderThread } from './render.js';
 import { searchIndex, threadMessages } from './search.js';
 import { loadIndex, saveIndex } from './store.js';
+import { isSlackTimestamp } from './time.js';
 
 type Args = { _: string[] } & { [key: string]: string | boolean | string[] | undefined };
 
@@ -42,6 +43,9 @@ async function main(argv = process.argv.slice(2)): Promise<void> {
   if (command === 'thread') {
     const ts = String(args._[1] ?? args.ts ?? '');
     if (!ts) throw new Error('thread requires a Slack timestamp');
+    if (!isSlackTimestamp(ts)) {
+      throw new Error('Invalid Slack thread timestamp: expected digits followed by a decimal point and fractional digits (for example, "1777586400.000100").');
+    }
     const index = await loadIndex(String(args.index ?? args.output ?? args.o ?? './.slackcache'));
     console.log(renderThread(threadMessages(index, ts, stringOpt(args.channel))));
     return;
@@ -112,7 +116,7 @@ function numberOpt(value: string | boolean | string[] | undefined): number | und
 }
 
 function printHelp(): void {
-  console.log(`slackcache — local-first Slack archive cache\n\nUsage:\n  slackcache import <export-dir> --output ./.slackcache\n  slackcache inspect <export-dir> --output ./.slackcache\n  slackcache scope --index ./.slackcache\n  slackcache search "deploy key" --index ./.slackcache [--channel general] [--limit 5]\n  slackcache thread <slack-ts> --index ./.slackcache [--channel general]\n\nSearch options:\n  --limit <count>  Maximum results; count must be a positive safe integer.\n\nEvery value-taking option requires its value. Missing values are usage errors.\n\nThread lookup infers the channel when the timestamp is unique. If multiple channels share a timestamp, pass --channel with a channel name or ID.\n\nDefaults are privacy-first: local files only, redaction on, no network calls.`);
+  console.log(`slackcache — local-first Slack archive cache\n\nUsage:\n  slackcache import <export-dir> --output ./.slackcache\n  slackcache inspect <export-dir> --output ./.slackcache\n  slackcache scope --index ./.slackcache\n  slackcache search "deploy key" --index ./.slackcache [--channel general] [--limit 5]\n  slackcache thread <slack-ts> --index ./.slackcache [--channel general]\n\nSearch options:\n  --limit <count>  Maximum results; count must be a positive safe integer.\n\nEvery value-taking option requires its value. Missing values are usage errors.\n\nThread timestamps use Slack's digits.fraction form (for example, 1777586400.000100). Thread lookup infers the channel when the timestamp is unique. If multiple channels share a timestamp, pass --channel with a channel name or ID.\n\nDefaults are privacy-first: local files only, redaction on, no network calls.`);
 }
 
 main().catch((error: unknown) => {
