@@ -161,6 +161,25 @@ test('CLI rejects malformed thread timestamps before writing an index', async ()
   }
 });
 
+test('CLI rejects malformed thread query timestamps before reading an index', async () => {
+  const cwd = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-thread-query-'));
+  try {
+    for (const timestamp of ['not-a-timestamp', '1777586400.', '1e309.000100', '9007199254740992.000100']) {
+      await assert.rejects(
+        execFileAsync('node', [path.resolve('dist/src/cli.js'), 'thread', timestamp, '--index', 'missing'], { cwd }),
+        (error: Error & { code?: number; stderr?: string }) => {
+          assert.notEqual(error.code, 0);
+          assert.match(error.stderr ?? '', /Invalid Slack thread timestamp: expected digits followed by a decimal point and fractional digits/);
+          assert.doesNotMatch(error.stderr ?? '', /ENOENT/);
+          return true;
+        },
+      );
+    }
+  } finally {
+    await rm(cwd, { recursive: true, force: true });
+  }
+});
+
 test('CLI rejects missing timestamps and malformed input shapes without writing an index', async () => {
   for (const input of [[{ channel: 'general', text: 'missing timestamp' }], { invalid: true }]) {
     const fixtureDir = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-input-'));
