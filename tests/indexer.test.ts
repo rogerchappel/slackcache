@@ -4,6 +4,8 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { buildIndex } from '../src/indexer.js';
+import { renderHits } from '../src/render.js';
+import { searchIndex } from '../src/search.js';
 
 test('builds a local export index with scope and redactions', async () => {
   const index = await buildIndex('fixtures/sample');
@@ -124,6 +126,50 @@ test('rejects non-array API, export, users, and channels JSON files', async () =
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
+  }
+});
+
+test('rejects malformed API fixture and export message entries with file and channel context', async () => {
+  for (const mode of ['api-fixture', 'export'] as const) {
+    for (const entry of [null, 'message', { channel: 'general', ts: '1777586400.000100', text: { invalid: true } }]) {
+      const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-message-'));
+      try {
+        const file = mode === 'api-fixture'
+          ? path.join(dir, 'messages.json')
+          : path.join(dir, 'general', '2026-05-01.json');
+        if (mode === 'export') await mkdir(path.dirname(file));
+        await writeFile(file, JSON.stringify([entry]));
+
+        await assert.rejects(
+          buildIndex(dir),
+          (error: Error) => {
+            assert.match(error.message, new RegExp(file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+            const expectedChannel = mode === 'export' || (entry && typeof entry === 'object') ? 'general' : 'unknown';
+            assert.match(error.message, new RegExp(`channel ${expectedChannel}, message 1`));
+            assert.match(error.message, entry && typeof entry === 'object' ? /text must be a string/ : /must be an object/);
+            return true;
+          },
+        );
+      } finally {
+        await rm(dir, { recursive: true, force: true });
+      }
+    }
+  }
+});
+
+test('imports, searches, and renders messages with omitted or string text', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-valid-message-'));
+  try {
+    await writeFile(path.join(dir, 'messages.json'), JSON.stringify([
+      { channel: 'general', ts: '1777586400.000100' },
+      { channel: 'general', ts: '1777586401.000100', text: 'deploy ready' },
+    ]));
+
+    const index = await buildIndex(dir);
+    assert.deepEqual(index.messages.map((message) => message.text), ['', 'deploy ready']);
+    assert.match(renderHits(searchIndex(index, 'deploy')), /deploy ready/);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
   }
 });
 
