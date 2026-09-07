@@ -69,7 +69,11 @@ slackcache inspect ./fixtures/sample --output ./out
 
 Every JSON file shown below must contain a top-level array. `users.json` and
 `channels.json` may be omitted, but malformed files are rejected rather than
-treated as empty metadata. Every message must contain a Slack timestamp as a
+treated as empty metadata. Each message array entry must be an object; its
+optional `text` field must be a string when present (omitted text becomes an
+empty searchable/renderable string). Shape errors identify the source file,
+channel, and one-based message position and stop before an index is written.
+Every message must contain a Slack timestamp as a
 string in `digits.fraction` form (for example, `"1777586400.000100"`). When
 `thread_ts` is present, it must use the same form. Missing, non-string, or
 malformed message timestamps and malformed thread timestamps stop the import
