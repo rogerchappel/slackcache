@@ -161,6 +161,26 @@ test('CLI rejects malformed thread timestamps before writing an index', async ()
   }
 });
 
+test('CLI rejects malformed metadata before writing an index', async () => {
+  const fixtureDir = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-metadata-'));
+  const outputDir = path.join(fixtureDir, 'output');
+  try {
+    await writeFile(path.join(fixtureDir, 'messages.json'), '[]');
+    await writeFile(path.join(fixtureDir, 'users.json'), JSON.stringify([{ id: 'U1', profile: { display_name: 42 } }]));
+    await assert.rejects(
+      execFileAsync('node', ['dist/src/cli.js', 'import', fixtureDir, '--output', outputDir]),
+      (error: Error & { stderr?: string }) => {
+        assert.match(error.stderr ?? '', /Invalid Slack user.*users\.json.*user 1/);
+        assert.match(error.stderr ?? '', /profile\.display_name must be a string/);
+        return true;
+      },
+    );
+    assert.equal(await pathExists(path.join(outputDir, 'index.json')), false);
+  } finally {
+    await rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('CLI rejects malformed thread query timestamps before reading an index', async () => {
   const cwd = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-thread-query-'));
   try {

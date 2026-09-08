@@ -157,6 +157,69 @@ test('rejects malformed API fixture and export message entries with file and cha
   }
 });
 
+test('rejects malformed user metadata entries in API fixtures and exports', async () => {
+  const invalidEntries: Array<[unknown, RegExp]> = [
+    [null, /entry must be an object/],
+    [[], /entry must be an object/],
+    ['user', /entry must be an object/],
+    [{ name: 'ada' }, /id must be a non-empty string/],
+    [{ id: 42 }, /id must be a non-empty string/],
+    [{ id: 'U1', name: 42 }, /name must be a string/],
+    [{ id: 'U1', real_name: false }, /real_name must be a string/],
+    [{ id: 'U1', profile: [] }, /profile must be an object/],
+    [{ id: 'U1', profile: { display_name: 42 } }, /profile\.display_name must be a string/],
+    [{ id: 'U1', deleted: 'no' }, /deleted must be a boolean/],
+  ];
+  for (const mode of ['api-fixture', 'export'] as const) {
+    for (const [entry, expected] of invalidEntries) {
+      const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-user-'));
+      try {
+        const file = path.join(dir, 'users.json');
+        await writeFile(file, JSON.stringify([entry]));
+        if (mode === 'api-fixture') await writeFile(path.join(dir, 'messages.json'), '[]');
+        await assert.rejects(buildIndex(dir), (error: Error) => {
+          assert.match(error.message, new RegExp(file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+          assert.match(error.message, /Slack user.*user 1/);
+          assert.match(error.message, expected);
+          return true;
+        });
+      } finally {
+        await rm(dir, { recursive: true, force: true });
+      }
+    }
+  }
+});
+
+test('rejects malformed channel metadata entries in API fixtures and exports', async () => {
+  const invalidEntries: Array<[unknown, RegExp]> = [
+    [null, /entry must be an object/],
+    [[], /entry must be an object/],
+    [7, /entry must be an object/],
+    [{ name: 'general' }, /id must be a non-empty string/],
+    [{ id: 'C1' }, /name must be a non-empty string/],
+    [{ id: 'C1', name: { invalid: true } }, /name must be a non-empty string/],
+    [{ id: 'C1', name: 'general', is_archived: 'no' }, /is_archived must be a boolean/],
+  ];
+  for (const mode of ['api-fixture', 'export'] as const) {
+    for (const [entry, expected] of invalidEntries) {
+      const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-invalid-channel-'));
+      try {
+        const file = path.join(dir, 'channels.json');
+        await writeFile(file, JSON.stringify([entry]));
+        if (mode === 'api-fixture') await writeFile(path.join(dir, 'messages.json'), '[]');
+        await assert.rejects(buildIndex(dir), (error: Error) => {
+          assert.match(error.message, new RegExp(file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+          assert.match(error.message, /Slack channel.*channel 1/);
+          assert.match(error.message, expected);
+          return true;
+        });
+      } finally {
+        await rm(dir, { recursive: true, force: true });
+      }
+    }
+  }
+});
+
 test('imports, searches, and renders messages with omitted or string text', async () => {
   const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-valid-message-'));
   try {
