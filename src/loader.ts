@@ -130,8 +130,33 @@ function validateMessages(entries: unknown[], file: string, exportChannel?: stri
       throw new Error(`Invalid Slack message in ${context}: entry must be an object.`);
     }
     const message = entry as Record<string, unknown>;
+    if (typeof message.ts !== 'string' || message.ts.length === 0) throw new Error(`Invalid Slack timestamp ${String(message.ts)} in ${context}: expected digits followed by a decimal point and fractional digits.`);
     if (message.text !== undefined && typeof message.text !== 'string') {
       throw new Error(`Invalid Slack message in ${context}: text must be a string when present.`);
+    }
+    optionalStrings(message, ['thread_ts'], `Slack message in ${context}`);
+    if (message.reply_count !== undefined && (typeof message.reply_count !== 'number' || !Number.isFinite(message.reply_count))) {
+      throw new Error(`Invalid Slack message in ${context}: reply_count must be a finite number when present.`);
+    }
+    if (message.reactions !== undefined) {
+      if (!Array.isArray(message.reactions)) throw new Error(`Invalid Slack message in ${context}: reactions must be an array when present.`);
+      message.reactions.forEach((reaction, reactionIndex) => {
+        const reactionContext = `${context}, reaction ${reactionIndex + 1}`;
+        const value = requireObject(reaction, `Slack reaction in ${reactionContext}`);
+        requireNonEmptyString(value, 'name', `Slack reaction in ${reactionContext}`);
+        if (typeof value.count !== 'number' || !Number.isFinite(value.count)) throw new Error(`Invalid Slack reaction in ${reactionContext}: count must be a finite number.`);
+        if (value.users !== undefined && (!Array.isArray(value.users) || value.users.some((user) => typeof user !== 'string'))) {
+          throw new Error(`Invalid Slack reaction in ${reactionContext}: users must be an array of strings when present.`);
+        }
+      });
+    }
+    if (message.files !== undefined) {
+      if (!Array.isArray(message.files)) throw new Error(`Invalid Slack message in ${context}: files must be an array when present.`);
+      message.files.forEach((file, fileIndex) => {
+        const fileContext = `${context}, file ${fileIndex + 1}`;
+        const value = requireObject(file, `Slack file in ${fileContext}`);
+        optionalStrings(value, ['id', 'name', 'mimetype', 'url_private'], `Slack file in ${fileContext}`);
+      });
     }
     return entry as ApiSlackMessage;
   });
