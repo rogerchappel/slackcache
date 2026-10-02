@@ -157,6 +157,33 @@ test('rejects malformed API fixture and export message entries with file and cha
   }
 });
 
+test('validates required message timestamps and structured metadata with source context', async () => {
+  const invalid: Array<[unknown, RegExp]> = [
+    [{ channel: 'general', text: 'missing timestamp' }, /Invalid Slack timestamp undefined/],
+    [{ channel: 'general', ts: '1', thread_ts: 42 }, /thread_ts must be a string/],
+    [{ channel: 'general', ts: '1', reactions: {} }, /reactions must be an array/],
+    [{ channel: 'general', ts: '1', reactions: [{ name: 'heart', count: '1' }] }, /count must be a finite number/],
+    [{ channel: 'general', ts: '1', files: [{ name: 42 }] }, /name must be a string/],
+    [{ channel: 'general', ts: '1', reply_count: '2' }, /reply_count must be a finite number/],
+  ];
+  for (const mode of ['api-fixture', 'export'] as const) {
+    for (const [entry, expected] of invalid) {
+      const dir = await mkdtemp(path.join(tmpdir(), 'slackcache-message-shape-'));
+      try {
+        const file = mode === 'api-fixture' ? path.join(dir, 'messages.json') : path.join(dir, 'general', '2026-05-01.json');
+        if (mode === 'export') await mkdir(path.dirname(file));
+        await writeFile(file, JSON.stringify([entry]));
+        await assert.rejects(buildIndex(dir), (error: Error) => {
+          assert.match(error.message, new RegExp(file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+          assert.match(error.message, /channel general, message 1/);
+          assert.match(error.message, expected);
+          return true;
+        });
+      } finally { await rm(dir, { recursive: true, force: true }); }
+    }
+  }
+});
+
 test('rejects malformed user metadata entries in API fixtures and exports', async () => {
   const invalidEntries: Array<[unknown, RegExp]> = [
     [null, /entry must be an object/],
